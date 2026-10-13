@@ -1,27 +1,24 @@
-# CORELESS FIELD / 360 — v0.4 (experimental)
+# CORELESS FIELD / 360 — v0.5
 
-Max/MSP/Jitter prototype for an incomplete spherical speaker dome. The layout is **provisional**, currently 1 + 7 + 10 + 10 + 8 = 36 loudspeakers in five rings. Speaker count is selectable from 2 to 40. Their positions stay fixed as sound moves.
+Experimental Max/MSP/Jitter spatial composition study for a **provisional** open-bottom loudspeaker dome of 2–40 channels (default: 36, rings 1+7+10+10+8).
 
-## Start
+## Run
 
-1. Keep `coreless_field.js` beside `coreless_field_360_v04.maxpat`.
-2. Open the Max patch and toggle **RUN**. The light-grey folded wire field should move slowly. Yellow indicates the source path. Black points are stationary speakers, activity crosses change size.
-3. Click `ezdac~` to hear the internal `noise~` test signal on the MacBook's stereo outputs. Watch the 40-channel `mc.meter~` activity display. **Start with a low system output volume.**
-4. Change speaker count (2–40), speed, deformation and panning width. Number changes regenerate the provisional dome.
+Place the `.maxpat` and `coreless_field.js` in one folder. Open the patch, click **RUN**, then activate `ezdac~` with the MacBook output volume LOW. The score lasts **15 minutes** of patch time, measured from RUN clock bangs; click RESET to restart. The upper dynamic source is the moving gold marker, while the tangled three-tube field is a separate slow visual system.
 
-## Design choices and limitations
+**40-channel meter:** look below the sound controls for the wide `mc.meter~` object. It displays the virtual 40-channel audition signal, while the real physical outputs remain **stereo only**.
 
-* The mesh is a compact artistic parameterization of curved tubular surfaces; it is **not an MHD or magnetostatic solution**. Do not describe it as a physically simulated magnetic field.
-* The fold curves and their cross-sections borrow legitimate differential-geometric language, but no Biot–Savart field is calculated.
-* `mc.meter~` reflects 40-channel pre-preview signal levels; unused channels receive zero gain. Stereo preview weights the virtual speakers by x-coordinate so motion is audible on two speakers.
-* Spatial preview is **not VBAP**. The actual loudspeaker spatializer, true measured ring elevations/azimuths, output mapping, room calibration and gain/safety limits must be designed before using a venue installation.
-* Matrices are reused. Mesh has 3 thin tubular curves, 94 segments and 6 cross-section subdivisions. Frame update is `qmetro 50`.
-* All 40 channels are calculated continuously. The routing is intended only for a stereo test until the venue output mapping is confirmed.
+## Piece outline (minutes)
 
-## Reference / algorithms
+* **0–2: Ground.** 47 Hz drone with beating, circulates along floor ring.
+* **2–5: Ascension.** Ascending virtual source elevation from -22° to +90°; frequency slowly rises.
+* **5–7: Zenith.** Held at top, narrow movements and sustained beating.
+* **7–10: Descent.** Downward spiral and falling fundamental.
+* **10–12:15: Instability.** Oscillating elevation, accelerated azimuth and detuning.
+* **12:15–15: Return.** Source settles to ground, slowing contour.
 
-For real 3D VBAP in Max: [nwolek/vbap](https://github.com/nwolek/vbap). It requires real speaker positions, ideally specified in azimuth/elevation, and a careful 3D triangulation.
+## Important caveats
 
-## Debug
+The tubular mesh is **not** a physically solved magnetic field; Biot–Savart and vector-potential ideas are inspiration, not algorithms being evaluated by this patch. Source panning uses a normalized Gaussian function of speaker angular distance and simple stereo downmix. **It is not VBAP**, and it does not produce acoustically correct vertical localization on two MacBook speakers; the elevation is visible in 3D and on the 40 virtual channel meters. A 3D VBAP external, correct venue speaker coordinates, output mapping and calibration are needed for the eventual physical installation.
 
-If nothing moves, ensure RUN is on and both `.maxpat` and `.js` are in the same folder; inspect Max Console for JavaScript/Jitter errors. Turn DSP on separately for sound. Only Max itself can verify installed-package compatibility.
+The `mc.meter~` and all `jit.gl.mesh` objects must be tested in an installed Max/Jitter environment; this version was structurally validated, not executed in Max. Before using the real loudspeaker system, verify gain and audio channel mapping.
