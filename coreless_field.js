@@ -1,19 +1,19 @@
-/* Coreless Field / 360 v0.4 -- Max js (ES5), Jitter visualization + preview gains.
+/* Coreless Field / 360 v0.5 -- Max js (ES5), Jitter visualization + preview gains.
    All speaker locations are static unless count/layout is changed.
    Matrix allocation happens only at initialization / count changes.
    This is an angular preview panner, NOT a VBAP implementation. The visual field is an artistic geometry, NOT a magnetic simulation. */
 autowatch = 1;
 inlets = 1;
-outlets = 9;
-var TAU=2*Math.PI, N=36, phase=0, speed=0.018, width=0.62, deformation=0.55;
+outlets = 11;
+var TAU=2*Math.PI, N=36, phase=0, speed=0.012, width=0.48, deformation=0.55, pieceTime=0, playing=1;
 var RINGS=[{el:90,n:1},{el:67,n:7},{el:39,n:10},{el:0,n:10},{el:-22,n:8}]; // 36; provisional room geometry
-var speakers=[], lines=3, steps=94, sides=6, matrixLines=null, matrixSpeakers=null, matrixHead=null, matrixPath=null, matrixActivity=null;
+var speakers=[], lines=3, steps=90, sides=6, matrixLines=null, matrixSpeakers=null, matrixHead=null, matrixPath=null, matrixActivity=null;
 var totalSegments=lines*steps*sides*2;
 function clamp(x,a,b){return Math.max(a,Math.min(b,x));}
 function unit(x,y,z){var k=Math.sqrt(x*x+y*y+z*z)||1;return [x/k,y/k,z/k];}
 function put(m,i,p){m.setcell1d(i,p);}
 function initMatrices(){matrixLines=new JitterMatrix(3,'float32',totalSegments*2);matrixSpeakers=new JitterMatrix(3,'float32',N);matrixHead=new JitterMatrix(3,'float32',1);matrixPath=new JitterMatrix(3,'float32',256);matrixActivity=new JitterMatrix(3,'float32',40*6*2);}
-function speakerPos(az,el){var a=az*Math.PI/180,e=el*Math.PI/180,c=Math.cos(e);return [1.75*c*Math.sin(a),1.75*Math.sin(e),1.75*c*Math.cos(a)];}
+function speakerPos(az,el){var a=az*Math.PI/180,e=el*Math.PI/180,c=Math.cos(e);return [1.47*c*Math.sin(a),1.47*Math.sin(e),1.47*c*Math.cos(a)];}
 function build(){speakers=[];var remaining=N, ringcount=RINGS.length, counts=[], i,j;
   if(N===2){counts=[0,0,0,2,0];}else{
     var weights=[1,7,10,10,8],sum=36;
@@ -45,7 +45,7 @@ function ring(u,k,t){var p=center(u,k,t), b=center(u+0.001,k,t), tangent=unit(b[
  for(var i=0;i<sides;i++){var w=TAU*i/sides;out.push([p[0]+radius*(Math.cos(w)*ax[0]+Math.sin(w)*bx[0]),p[1]+radius*(Math.cos(w)*ax[1]+Math.sin(w)*bx[1]),p[2]+radius*(Math.cos(w)*ax[2]+Math.sin(w)*bx[2])]);}
  return out;
 }
-function bang(){if(!matrixLines)build();phase+=speed;var idx=0,k,i,j,prev,curr,first;
+function bang(){if(!matrixLines)build();phase+=speed; if(playing)pieceTime=Math.min(900,pieceTime+0.05);var idx=0,k,i,j,prev,curr,first;
  for(k=0;k<lines;k++){
   prev=ring(0,k,phase);first=prev;
   for(i=0;i<steps;i++){
@@ -57,13 +57,30 @@ function bang(){if(!matrixLines)build();phase+=speed;var idx=0,k,i,j,prev,curr,f
     prev=curr;
   }
  }
- // Draw a gold trajectory independently of mesh topology.
- var u=(phase*0.22)%1,head=center(u,0,phase);
- for(i=0;i<256;i++)put(matrixPath,i,center(i/255,0,phase));
+ // Fixed-duration 15-minute score: elevation from floor to zenith, then a descent.
+ // Preview timeline advances only while RUN emits bangs; reset restarts the score.
+ var t=pieceTime, az,el,frequency,brightness;
+ if(t<120){el=-22;az=-120+0.65*t;frequency=47+0.012*t;brightness=0.55;}
+ else if(t<300){el=-22+112*(t-120)/180;az=-42+1.3*(t-120);frequency=48.5+20*(t-120)/180;brightness=0.72;}
+ else if(t<420){el=87+3*Math.sin(t*0.10);az=192+0.3*(t-300);frequency=68+0.012*(t-300);brightness=0.6;}
+ else if(t<600){el=90-112*(t-420)/180;az=225+1.1*(t-420);frequency=69.5-19*(t-420)/180;brightness=0.83;}
+ else if(t<735){el=8+35*Math.sin((t-600)*0.061);az=423+1.9*(t-600);frequency=52+5*Math.sin(t*0.038);brightness=0.85;}
+ else {el=-22+8*Math.sin((t-735)*0.021)*((900-t)/165);az=679+0.17*(t-735);frequency=48-(t-735)*0.006;brightness=0.46;}
+ var ar=az*Math.PI/180, er=el*Math.PI/180;
+ // Spatial sound path is decoupled from the decorative tubular mesh.
+ var direction=[Math.cos(er)*Math.sin(ar),Math.sin(er),Math.cos(er)*Math.cos(ar)];
+ var head=[direction[0]*1.27,direction[1]*1.27,direction[2]*1.27];
+ for(i=0;i<256;i++){
+  var lag=i/255*62;
+  var pa=ar-lag*0.018, pe=er+0.12*Math.sin(i*0.03+phase);
+  put(matrixPath,i,[1.24*Math.cos(pe)*Math.sin(pa),1.24*Math.sin(pe),1.24*Math.cos(pe)*Math.cos(pa)]);
+ }
  put(matrixHead,0,head);
- var hd=unit(head[0],head[1],head[2]),gain=[],power=0,maximum=0,active=0;
+ outlet(9,frequency);outlet(10,frequency+0.37+0.21*Math.sin(t*0.017));
+ outlet(5,'score',Math.floor(t/60)+'m'+Math.floor(t%60)+'s','elev',Math.round(el),'Hz',frequency.toFixed(2));
+ var hd=direction,gain=[],power=0,maximum=0,active=0;
  for(i=0;i<N;i++){
-  var s=speakers[i],d=clamp((s[0]*hd[0]+s[1]*hd[1]+s[2]*hd[2])/1.75,-1,1);
+  var s=speakers[i],d=clamp((s[0]*hd[0]+s[1]*hd[1]+s[2]*hd[2])/1.47,-1,1);
   var angle=Math.acos(d),g=Math.exp(-0.5*Math.pow(angle/width,2));gain.push(g);power+=g*g;
  }
  power=Math.sqrt(power)||1;
@@ -90,7 +107,7 @@ function bang(){if(!matrixLines)build();phase+=speed;var idx=0,k,i,j,prev,curr,f
  // Constant-power weighting of each speaker by its physical left-right position.
  var l=[],r=[];
  for(i=0;i<40;i++){
-   var az=i<N?speakers[i][0]/1.75:0;
+   var az=i<N?speakers[i][0]/1.47:0;
    var pan=clamp(0.5+0.5*az,0,1);
    l.push(gain[i]*Math.sqrt(1-pan));
    r.push(gain[i]*Math.sqrt(pan));
@@ -103,5 +120,7 @@ function setcount(v){N=clamp(Math.round(v),2,40);build();}
 function setspeed(v){speed=clamp(v,0,0.05);}
 function setwidth(v){width=clamp(v,0.08,1.5);}
 function setdeform(v){deformation=clamp(v,0,1.8);}
-function reset(){phase=0;}
+function reset(){phase=0;pieceTime=0;}
+function settime(v){pieceTime=clamp(v,0,900);}
+function play(v){playing=Number(v)!==0;}
 function loadbang(){build();}
