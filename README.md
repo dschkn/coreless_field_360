@@ -22,9 +22,9 @@ Für den neuen Pavillon der Kompositionsklasse ist ein **eigens konzipiertes 32-
 
 Magnetische Helizität beschreibt die globale Verknüpfung und Verdrillung magnetischer Feldlinien. Mit dem Vektorpotential **A** und dem Magnetfeld **B** = ∇ × **A**:
 
-\[
+$$
 H=\int_V \mathbf A\cdot\mathbf B\,dV
-\]
+$$
 
 Unter geeigneten Randbedingungen und in der idealen Magnetohydrodynamik bleibt diese Größe erhalten. Sie liefert einen Bezugspunkt für die Idee einer deformierbaren, aber topologisch organisierten räumlichen Struktur.
 
@@ -32,9 +32,9 @@ Unter geeigneten Randbedingungen und in der idealen Magnetohydrodynamik bleibt d
 
 Moffatt untersuchte den topologischen Verknüpfungsgrad von Wirbellinien und seine Beziehung zu Integralinvarianten. Für zwei dünne, geschlossene magnetische Flussröhren lautet der **gegenseitige Beitrag** zur Helizität:
 
-\[
+$$
 H_{\mathrm{mutual}}=2\,Lk_{12}\,\Phi_1\Phi_2
-\]
+$$
 
 Hier bezeichnet \(Lk_{12}\) die Verknüpfungszahl und \(\Phi_1,\Phi_2\) die magnetischen Flüsse. Die gesamte Helizität kann zusätzlich Eigenbeiträge durch Twist und Writhe enthalten. Die kompositorische Frage lautet: **Wie werden Verknüpfungen und räumliche Beziehungen zwischen Linien hörbar?**
 
@@ -42,16 +42,16 @@ Hier bezeichnet \(Lk_{12}\) die Verknüpfungszahl und \(\Phi_1,\Phi_2\) die magn
 
 Taylors Relaxationsprinzip beschreibt ein magnetisches System, das unter näherungsweiser Erhaltung der globalen Helizität einen energieärmeren Zustand erreicht. Als Variationsprinzip:
 
-\[
+$$
 \delta\!\left(E-\lambda H\right)=0
-\]
+$$
 
 Für einen entsprechenden relaxierten Zustand ergibt sich ein kraftfreies Feld:
 
-\[
+$$
 \nabla\times\mathbf B=\alpha\mathbf B,\qquad
 \nabla\cdot\mathbf B=0
-\]
+$$
 
 Dabei ist \(\alpha\) im idealisierten Taylor-Zustand räumlich konstant. Für **Coreless Field / 360** wird Relaxation als dramaturgisches Prinzip aufgegriffen: dichte, komplexe Konfigurationen können in andere räumliche Verteilungen und Bewegungszustände übergehen.
 
@@ -59,33 +59,33 @@ Dabei ist \(\alpha\) im idealisierten Taylor-Zustand räumlich konstant. Für **
 
 Eine räumliche Mittellinie \(\mathbf r(s)\) lässt sich als Überlagerung von Kurvenanteilen modellieren, beispielsweise:
 
-\[
+$$
 \mathbf r(s)=\sum_{n=1}^{N} A_n\sin(k_n s+\varphi_n)\,\mathbf e_n
-\]
+$$
 
 Um diese Kurve wird mit lokalem Radius \(a(s)\) und den beiden Querschnittsrichtungen \(\mathbf e_1(s)\), \(\mathbf e_2(s)\) eine Oberfläche erzeugt:
 
-\[
+$$
 \mathbf X(s,\phi)=\mathbf r(s)+a(s)
 \left[\cos\phi\,\mathbf e_1(s)+\sin\phi\,\mathbf e_2(s)\right]
-\]
+$$
 
-\[
+$$
 s\in[0,L],\qquad\phi\in[0,2\pi]
-\]
+$$
 
 Die Oberflächenmetrik lautet:
 
-\[
+$$
 g_{ij}=\partial_i\mathbf X\cdot\partial_j\mathbf X
-\]
+$$
 
 Für eine tatsächliche Magnetfeldlösung folgen Feldlinien der lokalen Feldrichtung:
 
-\[
+$$
 \frac{d\mathbf r}{ds}=
 \frac{\mathbf B(\mathbf r)}{\lVert\mathbf B(\mathbf r)\rVert}
-\]
+$$
 
 Diese Gleichung unterscheidet die physikalische Feldlinie von der frei gestalteten parametrischen Kurve in der aktuellen Visualisierung.
 
